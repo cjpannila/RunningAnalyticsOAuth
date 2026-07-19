@@ -18,7 +18,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -64,17 +66,24 @@ public class AuthController {
     }
 
     @GetMapping("/authcodes")
-    public ResponseEntity<Resource> downloadAuthCodes() {
+    public ResponseEntity<List<Map<String, String>>> downloadAuthCodes() throws IOException {
         Path path = Paths.get("auth_codes.csv");
         if (!Files.exists(path)) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(Collections.emptyList());
         }
-        Resource resource = new FileSystemResource(path);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=auth_codes.csv")
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(resource);
+        List<Map<String, String>> codes = Files.readAllLines(path)
+                .stream()
+                .map(line -> {
+                    String[] parts = line.split(",", 2);
+
+                    Map<String, String> item = new HashMap<>();
+                    item.put("timestamp", parts[0]);
+                    item.put("code", parts.length > 1 ? parts[1] : "");
+
+                    return item;
+                })
+                .toList();
+        return ResponseEntity.ok(codes);
     }
 
     @GetMapping("/authcodes/clear")
