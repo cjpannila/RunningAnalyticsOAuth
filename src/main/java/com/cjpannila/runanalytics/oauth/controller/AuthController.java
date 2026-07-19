@@ -29,24 +29,22 @@ public class AuthController {
     @GetMapping("/authenticate")
     public ResponseEntity<Void> authenticate(@RequestParam String code,
                                @RequestParam(required = false) String scope) throws IOException {
-
+        logger.info("Authenticating with code: " + code);
         saveCode(code);
-
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/runanalytics-oauth/"))
                 .build();
     }
 
     private synchronized void saveCode(String code) throws IOException {
-
         Path path = Paths.get("auth_codes.csv");
-
         Files.write(
                 path,
                 (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "," + code + System.lineSeparator()).getBytes(),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND
         );
+        logger.info("Saved code: " + code);
     }
 
     @GetMapping(value = "/apiinfo")
