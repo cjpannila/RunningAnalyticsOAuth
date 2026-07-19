@@ -21,6 +21,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/api")
 public class AuthController {
@@ -45,6 +50,40 @@ public class AuthController {
                 StandardOpenOption.APPEND
         );
         logger.info("Saved code: " + code);
+    }
+
+    private synchronized void clearContent() throws IOException {
+        Path path = Paths.get("auth_codes.csv");
+        Files.write(
+                path,
+                new byte[0],
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+        );
+        logger.info("Cleared auth codes");
+    }
+
+    @GetMapping("/authcodes")
+    public ResponseEntity<Resource> downloadAuthCodes() {
+        Path path = Paths.get("auth_codes.csv");
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+        Resource resource = new FileSystemResource(path);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=auth_codes.csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resource);
+    }
+
+    @GetMapping("/authcodes/clear")
+    public ResponseEntity<Void> clearAuthCodes() throws IOException {
+        logger.info("Clearing auth codes");
+        clearContent();
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/runanalytics-oauth/codes.html"))
+                .build();
     }
 
     @GetMapping(value = "/apiinfo")
