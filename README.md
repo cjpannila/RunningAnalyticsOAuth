@@ -9,6 +9,9 @@ Build with maven
 mvn clean install
 </code>
 
+Run the application
+mvn spring-boot:run -Dspring.profiles.active=local
+
 How to package
 <code>
 mvn clean package
