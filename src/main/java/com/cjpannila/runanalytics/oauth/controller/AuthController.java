@@ -37,9 +37,9 @@ public class AuthController {
 
     @GetMapping("/authenticate")
     public ResponseEntity<Void> authenticate(@RequestParam String code,
-                               @RequestParam(required = false) String scope) throws IOException {
+                               @RequestParam(required = false) String scope) throws Exception {
         logger.info("Authenticating with code: " + code);
-        emailService.sendAuthorizationCode(code, scope);
+        emailService.sendAuthorizationCodeEmailViaResend(code, scope);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/runanalytics-oauth/"))
                 .build();
