@@ -18,7 +18,7 @@ public class EmailService {
     public void sendAuthorizationCode(String code, String scope) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(Constants.EMAIL_ID);
-        message.setSubject("New Running Analytics System Authorization");
+        message.setSubject("Running Analytics System Authorization");
         message.setText("""
                 A new Running Analytics System authorization was received.
 
