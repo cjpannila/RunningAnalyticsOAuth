@@ -6,7 +6,7 @@ https://www.strava.com/oauth/authorize?client_id=218954&response_type=code&redir
 
 Build with maven
 <code>
-mvn clean install
+mvn clean install -Dspring.profiles.active=local
 </code>
 
 Run the application
@@ -14,7 +14,7 @@ mvn spring-boot:run -Dspring.profiles.active=local
 
 How to package
 <code>
-mvn clean package
+mvn clean package -Dspring.profiles.active=local
 run the application with the following command:
 java -jar target/runanalytics-oauth-0.0.1-SNAPSHOT.jar
 </code>
